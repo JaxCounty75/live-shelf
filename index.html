@@ -1,7 +1,8 @@
-ri<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Live Shelf</title>
+
   <style>
     body {
       font-family: Arial;
@@ -10,81 +11,92 @@ ri<!DOCTYPE html>
       text-align: center;
       padding: 50px;
     }
+
     .shelf {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 15px;
       margin-top: 30px;
     }
+
     .item {
       background: #222;
       padding: 20px;
       border-radius: 10px;
     }
+
     button {
-  padding: 14px 24px;
-  font-size: 16px;
-  margin-top: 25px;
-  border-radius: 8px;
-  background: #00c3ff;
-  color: black;
-  cursor: pointer;
+      padding: 14px 24px;
+      font-size: 16px;
+      margin-top: 25px;
+      border-radius: 8px;
+      background: #00c3ff;
+      color: black;
+      cursor: pointer;
+      border: none;
     }
-    
   </style>
 </head>
+
 <body>
 
   <h1>Live Shelf</h1>
-  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
+  <p>Your digital life, stored safely.</p>
 
-<button onclick="document.getElementById('fileInput').click()">
-  + Add to Shelf
-</button>
+  <!-- hidden file input -->
+  <input type="file" id="fileInput" style="display:none;">
 
-<div class="shelf" id="shelf"></div>
+  <!-- visible button -->
+  <button onclick="document.getElementById('fileInput').click()">
+    + Add to Shelf
+  </button>
 
-<script>
-function uploadItem() {
-  const fileInput = document.getElementById("fileInput");
+  <div class="shelf" id="shelf"></div>
 
-  if (fileInput.files.length === 0) {
-    alert("Choose a file first");
-    return;
-  }
+  <script>
+    // 🔥 this is what makes it AUTO upload after picking
+    document.getElementById("fileInput").addEventListener("change", uploadItem);
 
-  const file = fileInput.files[0];
-  const reader = new FileReader();
+    function uploadItem() {
+      const fileInput = document.getElementById("fileInput");
 
-  reader.onload = function(e) {
-    const data = e.target.result;
+      if (fileInput.files.length === 0) return;
 
-    let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-    items.push(data);
-    localStorage.setItem("shelfItems", JSON.stringify(items));
+      const file = fileInput.files[0];
+      const reader = new FileReader();
 
-    displayItem(data);
-  };
+      reader.onload = function(e) {
+        const data = e.target.result;
 
-  reader.readAsDataURL(file);
-}
+        let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+        items.push(data);
+        localStorage.setItem("shelfItems", JSON.stringify(items));
 
-function displayItem(data) {
-  const shelf = document.getElementById("shelf");
-  const item = document.createElement("div");
-  item.className = "item";
+        displayItem(data);
+      };
 
-  const img = document.createElement("img");
-  img.src = data;
-  img.style.width = "100%";
+      reader.readAsDataURL(file);
+    }
 
-  item.appendChild(img);
-  shelf.appendChild(item);
-}
+    function displayItem(data) {
+      const shelf = document.getElementById("shelf");
 
-window.onload = function() {
-  const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
-</script>
+      const item = document.createElement("div");
+      item.className = "item";
+
+      const img = document.createElement("img");
+      img.src = data;
+      img.style.width = "100%";
+
+      item.appendChild(img);
+      shelf.appendChild(item);
+    }
+
+    window.onload = function() {
+      const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+      items.forEach(displayItem);
+    };
+  </script>
+
 </body>
 </html>
