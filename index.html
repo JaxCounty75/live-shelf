@@ -36,16 +36,11 @@ ri<!DOCTYPE html>
 
   <h1>Live Shelf</h1>
   <p>Your digital life, stored safely.</p>
-
-<button onclick="document.getElementById('fileInput').click()">+ Add to Shelf</button>
-<input type="file" id="fileInput" onchange="uploadItem()" style="display:none;" />
-
 <div class="shelf" id="shelf"></div>
 
 <script>
-  function uploadItem(event) {
-  const fileInput = event.target;
-<input type="file" id="fileInput" onchange="uploadItem(event)" style="display:none;" />
+function uploadItem() {
+  const fileInput = document.getElementById("fileInput");
 
   if (fileInput.files.length === 0) {
     alert("Choose a file first");
@@ -85,6 +80,6 @@ window.onload = function() {
   const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
   items.forEach(displayItem);
 };
-    </script>
+</script>
    </body>
 </html> 
