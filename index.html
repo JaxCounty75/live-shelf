@@ -44,7 +44,11 @@
   <p>Your digital life, stored safely.</p>
 
   <!-- hidden file input -->
-  <input type="file" id="fileInput" style="display:none;">
+  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
+
+<button onclick="document.getElementById('fileInput').click()">
+  + Add to Shelf
+</button>
 
   <!-- visible button -->
   <button onclick="document.getElementById('fileInput').click()">
@@ -53,11 +57,9 @@
 
   <div class="shelf" id="shelf"></div>
 
-  
-    // 🔥 this is what makes it AUTO upload after picking
-  
-    <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
-<script>
+  <script>
+    document.getElementById("fileInput").addEventListener("change", uploadItem);
+
     function uploadItem() {
       const fileInput = document.getElementById("fileInput");
 
