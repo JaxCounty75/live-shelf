@@ -43,8 +43,9 @@ ri<!DOCTYPE html>
 <div class="shelf" id="shelf"></div>
 
 <script>
-function uploadItem() {
-  const fileInput = document.getElementById("fileInput");
+  function uploadItem(event) {
+  const fileInput = event.target;
+<input type="file" id="fileInput" onchange="uploadItem(event)" style="display:none;" />
 
   if (fileInput.files.length === 0) {
     alert("Choose a file first");
