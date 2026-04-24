@@ -22,20 +22,26 @@ ri<!DOCTYPE html>
       border-radius: 10px;
     }
     button {
-      padding: 10px 20px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 5px;
-      background: #00c3ff;
-      color: black;
-      cursor: pointer;
+  padding: 14px 24px;
+  font-size: 16px;
+  margin-top: 25px;
+  border-radius: 8px;
+  background: #00c3ff;
+  color: black;
+  cursor: pointer;
     }
+    
   </style>
 </head>
 <body>
 
   <h1>Live Shelf</h1>
   <p>Your digital life, stored safely.</p>
+  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()" />
+
+<button onclick="document.getElementById('fileInput').click()">
+  + Add to Shelf
+</button>
 <div class="shelf" id="shelf"></div>
 
 <script>
