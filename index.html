@@ -1,144 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Live Shelf Secure</title>
+<title>Live Shelf</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #111;
-      color: white;
-      text-align: center;
-      padding: 40px;
-    }
+<style>
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+  padding: 30px;
+}
 
-    .shelf {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 30px;
-    }
+button {
+  padding: 14px 24px;
+  font-size: 16px;
+  margin: 20px;
+  border-radius: 8px;
+  background: #00c3ff;
+  color: black;
+  cursor: pointer;
+  border: none;
+}
 
-    .item {
-      position: relative;
-      background: #222;
-      padding: 10px;
-      border-radius: 10px;
-    }
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
 
-    .item img {
-      width: 100%;
-      border-radius: 8px;
-    }
+.item {
+  background: #222;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+}
 
-    .remove {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: red;
-      border: none;
-      color: white;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-    }
+.item img {
+  width: 100%;
+  border-radius: 6px;
+}
 
-    .notice {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #aaa;
-    }
-
-    button {
-      padding: 14px 24px;
-      margin-top: 20px;
-      background: #00c3ff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
+.delete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px;
+}
+</style>
 </head>
 
 <body>
 
 <h1>Live Shelf</h1>
-<p>Upload → stored safely → remove from phone manually</p>
 
 <input type="file" id="fileInput" multiple style="display:none;">
-<button onclick="document.getElementById('fileInput').click()">
-  + Upload to Secure Shelf
-</button>
 
-<div class="notice">
-  After upload: you can safely delete the original from your phone 📱
-</div>
+<button onclick="document.getElementById('fileInput').click()">
+  + Add to Shelf
+</button>
 
 <div class="shelf" id="shelf"></div>
 
 <script>
-document.getElementById("fileInput").addEventListener("change", uploadItem);
+const fileInput = document.getElementById("fileInput");
 
-async function uploadItem() {
-  const files = document.getElementById("fileInput").files;
+fileInput.addEventListener("change", function () {
+  const files = fileInput.files;
 
-  for (let file of files) {
-    const formData = new FormData();
-    formData.append("image", file);
+  for (let i = 0; i < files.length; i++) {
+    const reader = new FileReader();
 
-    const res = await fetch("https://api.imgur.com/3/image", {
-      method: "POST",
-      headers: {
-        Authorization: "Client-ID YOUR_CLIENT_ID"
-      },
-      body: formData
-    });
+    reader.onload = function (e) {
+      const data = e.target.result;
 
-    const data = await res.json();
-    const url = data.data.link;
+      let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+      items.push(data);
+      localStorage.setItem("shelfItems", JSON.stringify(items));
 
-    let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-    items.push(url);
-    localStorage.setItem("shelfItems", JSON.stringify(items));
+      displayItem(data);
+    };
 
-    displayItem(url, items.length - 1);
+    reader.readAsDataURL(files[i]);
   }
-}
+});
 
-function displayItem(url, index) {
+function displayItem(data, index) {
   const shelf = document.getElementById("shelf");
 
   const item = document.createElement("div");
   item.className = "item";
 
   const img = document.createElement("img");
-  img.src = url;
+  img.src = data;
 
-  const remove = document.createElement("button");
-  remove.className = "remove";
-  remove.innerText = "×";
+  const del = document.createElement("button");
+  del.innerText = "X";
+  del.className = "delete";
 
-  remove.onclick = () => {
+  del.onclick = function () {
+    item.remove();
+
     let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
     items.splice(index, 1);
     localStorage.setItem("shelfItems", JSON.stringify(items));
-    reload();
   };
 
   item.appendChild(img);
-  item.appendChild(remove);
+  item.appendChild(del);
   shelf.appendChild(item);
 }
 
-function reload() {
-  const shelf = document.getElementById("shelf");
-  shelf.innerHTML = "";
+window.onload = function () {
   const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-  items.forEach((url, i) => displayItem(url, i));
-}
-
-window.onload = reload;
+  items.forEach((data, index) => displayItem(data, index));
+};
 </script>
 
 </body>
