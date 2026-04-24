@@ -41,32 +41,54 @@
 <button onclick="uploadItem()">Add to Shelf</button>
 
   <div class="shelf" id="shelf"></div>
-    <script>
-  function uploadItem() {
-    const fileInput = document.getElementById("fileInput");
-    const shelf = document.getElementById("shelf");
 
-    if (fileInput.files.length === 0) {
-      alert("Choose a file first");
-      return;
-    }
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCB8Zq2n6J8wJPtFptgzO7BEAE5YL-wQJg",
+  authDomain: "live-shelf-812d6.firebaseapp.com",
+  projectId: "live-shelf-812d6",
+  storageBucket: "live-shelf-812d6.firebasestorage.app",
+  messagingSenderId: "354914306246",
+  appId: "1:354914306246:web:be0739942e2b483620efc7"
+};
 
-    const file = fileInput.files[0];
-    const item = document.createElement("div");
-    item.className = "item";
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
 
-    if (file.type.startsWith("image/")) {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.style.width = "100%";
-      item.appendChild(img);
-    } else {
-      item.innerText = file.name;
-    }
+function uploadItem() {
+  const fileInput = document.getElementById("fileInput");
+  const shelf = document.getElementById("shelf");
 
-    shelf.appendChild(item);
+  if (fileInput.files.length === 0) {
+    alert("Choose a file first");
+    return;
   }
-  </script>
+
+  const file = fileInput.files[0];
+  const storageRef = storage.ref("uploads/" + file.name);
+
+  storageRef.put(file).then(snapshot => {
+    snapshot.ref.getDownloadURL().then(url => {
+      const item = document.createElement("div");
+      item.className = "item";
+
+      if (file.type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = url;
+        img.style.width = "100%";
+        item.appendChild(img);
+      } else {
+        item.innerText = file.name;
+      }
+
+      shelf.appendChild(item);
+    });
+  });
+}
+</script>
 
 </body>
 </html>
