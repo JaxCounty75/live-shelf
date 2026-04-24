@@ -40,27 +40,11 @@
   <input type="file" id="fileInput" />
 <button onclick="uploadItem()">Add to Shelf</button>
 
-  <div class="shelf" id="shelf"></div>
+<div class="shelf" id="shelf"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCB8Zq2n6J8wJPtFptgzO7BEAE5YL-wQJg",
-  authDomain: "live-shelf-812d6.firebaseapp.com",
-  projectId: "live-shelf-812d6",
-  storageBucket: "live-shelf-812d6.firebasestorage.app",
-  messagingSenderId: "354914306246",
-  appId: "1:354914306246:web:be0739942e2b483620efc7"
-};
-
-firebase.initializeApp(firebaseConfig);
-const storage = firebase.storage();
-
 function uploadItem() {
   const fileInput = document.getElementById("fileInput");
-  const shelf = document.getElementById("shelf");
 
   if (fileInput.files.length === 0) {
     alert("Choose a file first");
@@ -68,27 +52,38 @@ function uploadItem() {
   }
 
   const file = fileInput.files[0];
-  const storageRef = storage.ref("uploads/" + file.name);
+  const reader = new FileReader();
 
-  storageRef.put(file).then(snapshot => {
-    snapshot.ref.getDownloadURL().then(url => {
-      const item = document.createElement("div");
-      item.className = "item";
+  reader.onload = function(e) {
+    const data = e.target.result;
 
-      if (file.type.startsWith("image/")) {
-        const img = document.createElement("img");
-        img.src = url;
-        img.style.width = "100%";
-        item.appendChild(img);
-      } else {
-        item.innerText = file.name;
-      }
+    let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+    items.push(data);
+    localStorage.setItem("shelfItems", JSON.stringify(items));
 
-      shelf.appendChild(item);
-    });
-  });
+    displayItem(data);
+  };
+
+  reader.readAsDataURL(file);
 }
-</script>
 
-</body>
-</html>
+function displayItem(data) {
+  const shelf = document.getElementById("shelf");
+  const item = document.createElement("div");
+  item.className = "item";
+
+  const img = document.createElement("img");
+  img.src = data;
+  img.style.width = "100%";
+
+  item.appendChild(img);
+  shelf.appendChild(item);
+}
+
+window.onload = function() {
+  const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+  items.forEach(displayItem);
+};
+    </script>
+   </body>
+</html> 
