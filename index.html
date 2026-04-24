@@ -158,12 +158,15 @@ function displayItems() {
 window.onload = displayItems;
 </script>
   
-  <div class="shelf" id="shelf"></div>
+<div class="shelf" id="shelf"></div>
 
 <input type="file" id="fileInput" multiple style="display:none;">
 
+<button onclick="document.getElementById('fileInput').click()">
+  + Add to Shelf
+</button>
+
 <script src="app.js"></script>
-  
 </body>
 </html>
 <!-- update -->
