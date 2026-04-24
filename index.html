@@ -36,12 +36,12 @@ ri<!DOCTYPE html>
 <body>
 
   <h1>Live Shelf</h1>
-  <p>Your digital life, stored safely.</p>
-  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()" />
+  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
 
 <button onclick="document.getElementById('fileInput').click()">
   + Add to Shelf
 </button>
+
 <div class="shelf" id="shelf"></div>
 
 <script>
@@ -84,8 +84,7 @@ function displayItem(data) {
 
 window.onload = function() {
   const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-  items.forEach(displayItem);
-};
+  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
 </script>
-   </body>
-</html> 
+</body>
+</html>
