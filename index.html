@@ -5,53 +5,85 @@
 
 <style>
 body {
-  font-family: Arial;
-  background: #111;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #0a0a0a, #000);
   color: white;
   text-align: center;
-  padding: 30px;
+  padding: 20px;
+  margin: 0;
 }
 
+/* HEADER */
+h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+p {
+  opacity: 0.6;
+  margin-bottom: 20px;
+}
+
+/* BUTTON */
 button {
-  padding: 14px 24px;
+  padding: 14px 28px;
   font-size: 16px;
-  margin: 20px;
-  border-radius: 8px;
-  background: #00c3ff;
-  color: black;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00c3ff, #0066ff);
+  color: white;
   cursor: pointer;
   border: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(0,195,255,0.3);
 }
 
+button:active {
+  transform: scale(0.95);
+}
+
+/* GRID */
 .shelf {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 15px;
   margin-top: 20px;
 }
 
+/* CARD */
 .item {
-  background: #222;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 16px;
   position: relative;
+  animation: fadeIn 0.3s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* IMAGE */
 .item img {
   width: 100%;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
+/* DELETE */
 .delete {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background: red;
-  color: white;
+  top: 6px;
+  right: 6px;
+  background: rgba(255,0,0,0.8);
   border: none;
-  border-radius: 5px;
+  border-radius: 50%;
+  color: white;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
   cursor: pointer;
-  padding: 5px;
 }
 </style>
 </head>
@@ -59,6 +91,7 @@ button {
 <body>
 
 <h1>Live Shelf</h1>
+<p>Your digital shelf. Fast. Private. Yours.</p>
 
 <input type="file" id="fileInput" multiple style="display:none;">
 
@@ -84,43 +117,45 @@ fileInput.addEventListener("change", function () {
       items.push(data);
       localStorage.setItem("shelfItems", JSON.stringify(items));
 
-      displayItem(data);
+      displayItems();
     };
 
     reader.readAsDataURL(files[i]);
   }
 });
 
-function displayItem(data, index) {
+/* DISPLAY ALL (clean + fixes delete bugs) */
+function displayItems() {
   const shelf = document.getElementById("shelf");
+  shelf.innerHTML = "";
 
-  const item = document.createElement("div");
-  item.className = "item";
+  let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
 
-  const img = document.createElement("img");
-  img.src = data;
+  items.forEach((data, index) => {
+    const item = document.createElement("div");
+    item.className = "item";
 
-  const del = document.createElement("button");
-  del.innerText = "X";
-  del.className = "delete";
+    const img = document.createElement("img");
+    img.src = data;
 
-  del.onclick = function () {
-    item.remove();
+    const del = document.createElement("button");
+    del.innerText = "X";
+    del.className = "delete";
 
-    let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-    items.splice(index, 1);
-    localStorage.setItem("shelfItems", JSON.stringify(items));
-  };
+    del.onclick = function () {
+      items.splice(index, 1);
+      localStorage.setItem("shelfItems", JSON.stringify(items));
+      displayItems();
+    };
 
-  item.appendChild(img);
-  item.appendChild(del);
-  shelf.appendChild(item);
+    item.appendChild(img);
+    item.appendChild(del);
+    shelf.appendChild(item);
+  });
 }
 
-window.onload = function () {
-  const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-  items.forEach((data, index) => displayItem(data, index));
-};
+/* LOAD ON START */
+window.onload = displayItems;
 </script>
 
 </body>
