@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Live Shelf</title>
+  <title>Live Shelf Secure</title>
 
   <style>
     body {
@@ -9,7 +9,7 @@
       background: #111;
       color: white;
       text-align: center;
-      padding: 50px;
+      padding: 40px;
     }
 
     .shelf {
@@ -20,87 +20,126 @@
     }
 
     .item {
+      position: relative;
       background: #222;
-      padding: 20px;
+      padding: 10px;
       border-radius: 10px;
+    }
+
+    .item img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .remove {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .notice {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #aaa;
     }
 
     button {
       padding: 14px 24px;
-      font-size: 16px;
-      margin-top: 25px;
-      border-radius: 8px;
+      margin-top: 20px;
       background: #00c3ff;
-      color: black;
-      cursor: pointer;
       border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>Live Shelf</h1>
-  <p>Your digital life, stored safely.</p>
+<h1>Live Shelf</h1>
+<p>Upload → stored safely → remove from phone manually</p>
 
-  <!-- hidden file input -->
-  <input type="file" id="fileInput" style="display:none;" onchange="uploadItem()">
-
+<input type="file" id="fileInput" multiple style="display:none;">
 <button onclick="document.getElementById('fileInput').click()">
-  + Add to Shelf
+  + Upload to Secure Shelf
 </button>
 
-  <!-- visible button -->
-  <button onclick="document.getElementById('fileInput').click()">
-    + Add to Shelf
-  </button>
+<div class="notice">
+  After upload: you can safely delete the original from your phone 📱
+</div>
 
-  <div class="shelf" id="shelf"></div>
+<div class="shelf" id="shelf"></div>
 
-  <script>
-    document.getElementById("fileInput").addEventListener("change", uploadItem);
+<script>
+document.getElementById("fileInput").addEventListener("change", uploadItem);
 
-    function uploadItem() {
-      const fileInput = document.getElementById("fileInput");
+async function uploadItem() {
+  const files = document.getElementById("fileInput").files;
 
-      if (fileInput.files.length === 0) return;
+  for (let file of files) {
+    const formData = new FormData();
+    formData.append("image", file);
 
-      const file = fileInput.files[0];
-      const reader = new FileReader();
+    const res = await fetch("https://api.imgur.com/3/image", {
+      method: "POST",
+      headers: {
+        Authorization: "Client-ID YOUR_CLIENT_ID"
+      },
+      body: formData
+    });
 
-      reader.onload = function(e) {
-        const data = e.target.result;
+    const data = await res.json();
+    const url = data.data.link;
 
-        let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-        items.push(data);
-        localStorage.setItem("shelfItems", JSON.stringify(items));
+    let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+    items.push(url);
+    localStorage.setItem("shelfItems", JSON.stringify(items));
 
-        displayItem(data);
-      };
+    displayItem(url, items.length - 1);
+  }
+}
 
-      reader.readAsDataURL(file);
-    }
+function displayItem(url, index) {
+  const shelf = document.getElementById("shelf");
 
-    function displayItem(data) {
-      const shelf = document.getElementById("shelf");
+  const item = document.createElement("div");
+  item.className = "item";
 
-      const item = document.createElement("div");
-      item.className = "item";
+  const img = document.createElement("img");
+  img.src = url;
 
-      const img = document.createElement("img");
-      img.src = data;
-      img.style.width = "100%";
+  const remove = document.createElement("button");
+  remove.className = "remove";
+  remove.innerText = "×";
 
-      item.appendChild(img);
-      shelf.appendChild(item);
-    }
+  remove.onclick = () => {
+    let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+    items.splice(index, 1);
+    localStorage.setItem("shelfItems", JSON.stringify(items));
+    reload();
+  };
 
-    window.onload = function() {
-      const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
-      items.forEach(displayItem);
-    };
-  </script>
+  item.appendChild(img);
+  item.appendChild(remove);
+  shelf.appendChild(item);
+}
+
+function reload() {
+  const shelf = document.getElementById("shelf");
+  shelf.innerHTML = "";
+  const items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+  items.forEach((url, i) => displayItem(url, i));
+}
+
+window.onload = reload;
+</script>
 
 </body>
 </html>
-
