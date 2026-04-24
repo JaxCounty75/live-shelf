@@ -37,18 +37,35 @@
   <h1>Live Shelf</h1>
   <p>Your digital life, stored safely.</p>
 
-  <button onclick="addItem()">Add to Shelf</button>
+  <input type="file" id="fileInput" />
+<button onclick="uploadItem()">Add to Shelf</button>
 
   <div class="shelf" id="shelf"></div>
+    <script>
+  function uploadItem() {
+    const fileInput = document.getElementById("fileInput");
+    const shelf = document.getElementById("shelf");
 
-  <script>
-    function addItem() {
-      const shelf = document.getElementById("shelf");
-      const item = document.createElement("div");
-      item.className = "item";
-      item.innerText = "New Item";
-      shelf.appendChild(item);
+    if (fileInput.files.length === 0) {
+      alert("Choose a file first");
+      return;
     }
+
+    const file = fileInput.files[0];
+    const item = document.createElement("div");
+    item.className = "item";
+
+    if (file.type.startsWith("image/")) {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.style.width = "100%";
+      item.appendChild(img);
+    } else {
+      item.innerText = file.name;
+    }
+
+    shelf.appendChild(item);
+  }
   </script>
 
 </body>
