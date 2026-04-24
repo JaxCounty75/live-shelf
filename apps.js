@@ -1,72 +1,92 @@
-// AUTO upload when file selected
-document.getElementById("fileInput").addEventListener("change", uploadItem);
+// ===== INIT =====
+const fileInput = document.getElementById("fileInput");
+const shelf = document.getElementById("shelf");
 
-function uploadItem() {
-  const fileInput = document.getElementById("fileInput");
+// auto upload when file picked
+fileInput.addEventListener("change", uploadItems);
 
-  if (!fileInput.files.length) return;
+// load on start
+window.onload = displayItems;
 
-  const files = Array.from(fileInput.files);
 
-  let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+// ===== UPLOAD FILES =====
+function uploadItems() {
+  const files = fileInput.files;
+  if (!files.length) return;
 
-  files.forEach(file => {
+  let items = JSON.parse(localStorage.getItem("vaultItems")) || [];
+
+  Array.from(files).forEach(file => {
     const reader = new FileReader();
 
     reader.onload = function(e) {
-      const data = e.target.result;
-      items.push(data);
-      localStorage.setItem("shelfItems", JSON.stringify(items));
+      const newItem = {
+        name: file.name,
+        type: file.type,
+        data: e.target.result,
+        date: Date.now()
+      };
+
+      items.push(newItem);
+      localStorage.setItem("vaultItems", JSON.stringify(items));
+
       displayItems();
     };
 
     reader.readAsDataURL(file);
   });
 
-  fileInput.value = ""; // reset so same file can be picked again
+  fileInput.value = ""; // reset input
 }
 
+
+// ===== DISPLAY FILES =====
 function displayItems() {
-  const shelf = document.getElementById("shelf");
   shelf.innerHTML = "";
 
-  let items = JSON.parse(localStorage.getItem("shelfItems")) || [];
+  let items = JSON.parse(localStorage.getItem("vaultItems")) || [];
 
-  items.forEach((data, index) => {
-    const item = document.createElement("div");
-    item.className = "item";
+  items.forEach((item, index) => {
+    const box = document.createElement("div");
+    box.className = "item";
 
-    const img = document.createElement("img");
-    img.src = data;
+    let content;
 
-    // tap = fullscreen
-    img.onclick = () => {
-      document.getElementById("viewer").style.display = "flex";
-      document.getElementById("viewerImg").src = data;
-    };
+    // image preview
+    if (item.type.startsWith("image/")) {
+      content = document.createElement("img");
+      content.src = item.data;
+    } 
+    // video preview
+    else if (item.type.startsWith("video/")) {
+      content = document.createElement("video");
+      content.src = item.data;
+      content.controls = true;
+    } 
+    // other files
+    else {
+      content = document.createElement("div");
+      content.innerHTML = `
+        <div style="padding:15px;">
+          📁 <br>
+          <small>${item.name}</small>
+        </div>
+      `;
+    }
 
+    // DELETE BUTTON
     const del = document.createElement("button");
-    del.innerText = "X";
+    del.innerText = "×";
     del.className = "delete";
 
     del.onclick = function () {
       items.splice(index, 1);
-      localStorage.setItem("shelfItems", JSON.stringify(items));
+      localStorage.setItem("vaultItems", JSON.stringify(items));
       displayItems();
     };
 
-    item.appendChild(img);
-    item.appendChild(del);
-    shelf.appendChild(item);
+    box.appendChild(content);
+    box.appendChild(del);
+    shelf.appendChild(box);
   });
 }
-
-// load saved images
-window.onload = function () {
-  displayItems();
-};
-
-// close viewer
-document.getElementById("viewer").onclick = function () {
-  this.style.display = "none";
-};
