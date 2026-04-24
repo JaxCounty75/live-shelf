@@ -37,7 +37,8 @@
   <h1>Live Shelf</h1>
   <p>Your digital life, stored safely.</p>
 
-<input type="file" id="fileInput" onchange="uploadItem()" />
+<input type="file" id="fileInput" style="display:none;" onchange="uploadItem()" />
+<button onclick="document.getElementById('fileInput').click()">+ Add to Shelf</button>
 
 <div class="shelf" id="shelf"></div>
 
