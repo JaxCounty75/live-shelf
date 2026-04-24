@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Shelf</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+    .shelf {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .item {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 5px;
+      background: #00c3ff;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Live Shelf</h1>
+  <p>Your digital life, stored safely.</p>
+
+  <button onclick="addItem()">Add to Shelf</button>
+
+  <div class="shelf" id="shelf"></div>
+
+  <script>
+    function addItem() {
+      const shelf = document.getElementById("shelf");
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerText = "New Item";
+      shelf.appendChild(item);
+    }
+  </script>
+
+</body>
+</html>
